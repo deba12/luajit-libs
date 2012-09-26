@@ -5,14 +5,17 @@ int compress2gzip(uint8_t *dest, unsigned long *destLen,
 		const uint8_t *source, unsigned long sourceLen, int level);
 ]]
 
+local zlib = ffi.load("z")
 local gzlib = ffi.load("./gzlib.so")
 
-function compress(txt)
+function compress(txt, level)
 	local n = zlib.compressBound(#txt)
 	local buf = ffi.new("uint8_t[?]", n)
 	local buflen = ffi.new("unsigned long[1]", n)
-	local res = gzlib.compress2gzip(buf, buflen, txt, #txt, 9)
+	local res = gzlib.compress2gzip(buf, buflen, txt, #txt, level)
 	assert(res == 0)
 	return ffi.string(buf, buflen[0])
 end
 
+output = compress("ABCDABCDAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA", 9)
+print(output)
